@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <div id="app">
+    <v-overlay :value="overlay" style="text-align: center;">
+      <h2>Đang trong quá trình xử lý vui lòng không bấm nút gì khác. <br/> Quá trình xử lý có thể sẽ rất lâu, bạn có thể làm việc khác trong khi chờ xử lý xong</h2>
+      <v-progress-circular indeterminate color="blue" size="45"></v-progress-circular>
+  </v-overlay>
+    <v-app>
+      <v-main>
+        <v-container>
+          
+          <h1 style="text-align:center">Auto labeling</h1>
+          <v-row>
+
+            <v-col>
+              <h5 style="text-align:center">Hướng dẫn sử dụng</h5>
+              <v-col>
+
+                <v-expansion-panels dark>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Bước 1 
+                     
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      Nén dữ liệu huấn luyện có phân loại thư mục của bạn vào file zip và tải lên.  <br/>
+                      Nén thư mục data 
+                      <v-col>
+                        <img src="./images/Capture.PNG" alt=""> <br/>
+                      Trong data có thư mục train và val
+                        <img src="./images/Capture1.PNG" alt=""> <br/>
+                      Trong mỗi thư mục có các thư mục con với tên là tên lớp muốn phân loại.<br/>
+                      Chú ý: class1,class2 là tên lớp bạn muốn nhận biết với yolo
+                        <img src="./images/Capture3.PNG" alt="">
+                      </v-col>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Bước 2
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      Để tất cả tập ảnh bạn muốn xử lý vào một thư mục và nén chúng thành định dạng zip 
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Bước 3
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      Bạn có thể sử dụng mặc định của yolov5 để detect hoặc tự chuẩn bị một file custom.pt đã được train đủ để đóng khung được các lớp bạn muốn 
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Video hướng dẫn
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <iframe width="560" height="315" src="https://www.youtube.com/embed/rU9tFNNRzGg"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </v-col>
+            </v-col>
+            <v-col>
+
+              <transition name="slide-fade">
+                <v-alert border="top" :color="alert.status" v-if="alert.message != ''" dark>
+                  {{alert.message}}
+                </v-alert>
+              </transition>
+
+              <v-btn color="primary" @click="resetAll()">Chọn lại</v-btn>
+              <v-stepper v-model="e6" vertical class="opa" dark>
+                <v-stepper-step :complete="e6 > 1" step="1">
+                  Chọn file huấn luyện ( .zip )
+                  <small>Thư mục chứa ảnh để huấn luyện phân loại lớp</small>
+                </v-stepper-step>
+
+                <v-stepper-content step="1">
+                  <!-- <input type="file" @change="selectFile0"> -->
+                  <v-file-input @change="selectFile1" counter show-size truncate-length="31"></v-file-input>
+                  <v-btn color="primary" @click="clickNextStep(2)">
+                    Tiếp tục
+                  </v-btn>
+                </v-stepper-content>
+
+                <v-stepper-step :complete="e6 > 2" step="2">
+                  Chọn tập dữ liệu ( .zip )
+                  <small>Thư mục chứa ảnh để xác định bounding box</small>
+                </v-stepper-step>
+
+                <v-stepper-content step="2">
+                  <v-file-input @change="selectFile2" counter show-size truncate-length="31"></v-file-input>
+                  <v-btn color="primary" @click="clickNextStep(3)">
+                    Tiếp tục
+                  </v-btn>
+                  <v-btn text @click="e6 = 1">
+                    Trở lại
+                  </v-btn>
+                </v-stepper-content>
+
+                <v-stepper-step :complete="e6 > 3" step="3">
+                  Chọn model detect
+                </v-stepper-step>
+                <v-stepper-content step="3">
+                  <v-file-input v-show='show' @change="selectFile3" counter show-size truncate-length="31">
+                  </v-file-input>
+                  <v-btn v-show='show' color="primary" @click="clickNextStep(4)">
+                    Tiếp tục
+                  </v-btn>
+                  <v-btn v-show='!show' color="primary" @click="show = !show">
+                    Tự huấn luyện
+                  </v-btn>
+                  <v-btn v-show='!show' color="primary" @click="clickNextStep(4)">
+                    Mặc định
+                  </v-btn>
+                  <v-btn text @click="e6 = 2; show = !show">
+                    Trở lại
+                  </v-btn>
+                </v-stepper-content>
+
+                <v-stepper-step :complete="e6 > 3" step="4">
+                  Hoàn Thành
+                </v-stepper-step>
+
+                <v-stepper-content step="4">
+                  <a :href="res" v-if='res != null '>Kết quả</a>
+                  <v-btn color="primary" @click="completeUpload()">
+                    Hoàn thành
+                  </v-btn>
+                </v-stepper-content>
+                <!-- <v-stepper-step :complete="e6 > 3" step="4">
+                  Hoàn thành
+                </v-stepper-step> -->
+              </v-stepper>
+            </v-col>
+          </v-row>
+
+        </v-container>
+
+      </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data() {
+        return {
+          overlay: false,
+          show: false,
+          res: null ,
+          alert: {
+            status: '',
+            message: ''
+          },
+          BASE_URL: ' http://127.0.0.1:5000/',
+          e6: 1,
+          file1: null,
+          file2: null,
+          file3: null,
+          valueSelected: '.txt',
+        }
+      },
+      methods: {
+        resetAlert() {
+          setTimeout(() => {
+            this.alert.message = ''
+            this.alert.status = ''
+          }, 2000)
+        },
+        clickNextStep(i) {
+          if (i == 2) {
+            if (this.file1 == null) {
+              this.alert.status = 'error'
+              this.alert.message = 'Bạn bắt buộc phải chọn file'
+
+            } else {
+              try {
+                if (this.file1.name.split('.')[1] == 'zip') {
+                  this.e6 = i
+                } else {
+
+                  this.alert.status = 'error'
+                  this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .zip'
+                }
+              } catch (error) {
+
+                this.alert.status = 'error'
+                this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .zip'
+              }
+
+            }
+
+          } else if (i == 3) {
+            if (this.file2 == null) {
+              this.alert.status = 'error'
+              this.alert.message = 'Bạn bắt buộc phải chọn file'
+            } else {
+              try {
+                if (this.file2.name.split('.')[1] == 'zip') {
+                  this.e6 = i
+                } else {
+
+                  this.alert.status = 'error'
+                  this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .zip'
+                }
+              } catch (error) {
+
+                this.alert.status = 'error'
+                this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .zip'
+              }
+            }
+          } else if (i == 4) {
+            if (this.file3 == null && this.show == true) {
+              this.alert.status = 'error'
+              this.alert.message = 'Bạn bắt buộc phải chọn file'
+            } else if (this.show == true) {
+              try {
+                if (this.file3.name.split('.')[1] == 'pt') {
+                  this.e6 = i
+                } else {
+
+                  this.alert.status = 'error'
+                  this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .pt'
+                }
+              } catch (error) {
+
+                this.alert.status = 'error'
+                this.alert.message = 'Bạn bắt buộc phải chọn file đúng định dạng .pt'
+              }
+            } else {
+              this.e6 = i
+            }
+          }
+
+          this.resetAlert()
+        },
+        resetAll() {
+          this.e6 = 1
+          this.show = false
+        
+        },
+        selectFile1(event) {
+          // console.log(event)
+          this.file1 = event
+         
+        },
+        selectFile2(event) {
+          this.file2 = event
+        },
+        selectFile3(event) {
+          this.file3 = event
+        },
+        completeUpload: async function () {
+          this.res = null 
+          let data1 = new FormData();
+          data1.append('file', this.file1);
+          this.overlay = true
+          let resp1 = await fetch(`${this.BASE_URL}/api/upload-data-classifier`, {
+            body: data1,
+            method: 'POST',
+          })
+          let status = await resp1.status
+        
+          if (status != 200) {
+            error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
+            error.message = 'warning'
+          } else {
+            let data2 = new FormData()
+            data2.append('file', this.file2);
+          
+            let resp2 = await fetch(`${this.BASE_URL}/api/upload-data-boundingbox`, {
+              body: data2,
+              method: 'POST',
+            })
+            status = await resp2.status
+         
+            if (status != 200) {
+              error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
+              error.message = 'warning'
+            }
+          }
+
+          if (this.show == true) {
+            let data3 = new FormData();
+            data3.append('file', this.file3);
+          
+            let resp3 = await fetch(`${this.BASE_URL}/api/upload-data-classifier`, {
+              body: data3,
+              method: 'POST',
+            })
+            status = await resp3.status
+         
+            if (status != 200) {
+              error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
+              error.message = 'warning'
+            }
+          }
+
+          // get result
+          let resp = await fetch(`${this.BASE_URL}/api/get-result`,{
+            method:'POST'
+          })
+          let resL = await resp.json()
+          this.res = resL.message
+          setTimeout(()=>{
+            this.overlay = false 
+          }, 1000)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

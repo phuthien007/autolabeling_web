@@ -1,0 +1,21 @@
+/* reset css  */
+#app{
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#app{
+    /* background  */
+    background-image: url('https://th.bing.com/th/id/R.2d6685e707bfc754c8da1bb5e4f79475?rik=7kDcPF0ZnNJMYw&riu=http%3a%2f%2fwonderfulengineering.com%2fwp-content%2fuploads%2f2014%2f01%2fTechnology-Wallpapers-6.jpg&ehk=Gvm274Hl32Bt9CewTE%2bFi2hWuGnOEQeJZhaF1I106wk%3d&risl=&pid=ImgRaw&r=0');
+    color: #fff;
+    font-size: 36px;
+}
+
+.opa{
+    color: #fff;
+}
+
