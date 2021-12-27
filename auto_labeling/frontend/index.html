@@ -13,13 +13,14 @@
 
   <div id="app">
     <v-overlay :value="overlay" style="text-align: center;">
-      <h2>Đang trong quá trình xử lý vui lòng không bấm nút gì khác. <br/> Quá trình xử lý có thể sẽ rất lâu, bạn có thể làm việc khác trong khi chờ xử lý xong</h2>
+      <h2>Đang trong quá trình xử lý vui lòng không bấm nút gì khác. <br /> Quá trình xử lý có thể sẽ rất lâu, bạn có
+        thể làm việc khác trong khi chờ xử lý xong</h2>
       <v-progress-circular indeterminate color="blue" size="45"></v-progress-circular>
-  </v-overlay>
+    </v-overlay>
     <v-app>
       <v-main>
         <v-container>
-          
+
           <h1 style="text-align:center">Auto labeling</h1>
           <v-row>
 
@@ -30,18 +31,18 @@
                 <v-expansion-panels dark>
                   <v-expansion-panel>
                     <v-expansion-panel-header>
-                      Bước 1 
-                     
+                      Bước 1
+
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      Nén dữ liệu huấn luyện có phân loại thư mục của bạn vào file zip và tải lên.  <br/>
-                      Nén thư mục data 
+                      Nén dữ liệu huấn luyện có phân loại thư mục của bạn vào file zip và tải lên. <br />
+                      Nén thư mục data
                       <v-col>
-                        <img src="./images/Capture.PNG" alt=""> <br/>
-                      Trong data có thư mục train và val
-                        <img src="./images/Capture1.PNG" alt=""> <br/>
-                      Trong mỗi thư mục có các thư mục con với tên là tên lớp muốn phân loại.<br/>
-                      Chú ý: class1,class2 là tên lớp bạn muốn nhận biết với yolo
+                        <img src="./images/Capture.PNG" alt=""> <br />
+                        Trong data có thư mục train và val
+                        <img src="./images/Capture1.PNG" alt=""> <br />
+                        Trong mỗi thư mục có các thư mục con với tên là tên lớp muốn phân loại.<br />
+                        Chú ý: class1,class2 là tên lớp bạn muốn nhận biết với yolo
                         <img src="./images/Capture3.PNG" alt="">
                       </v-col>
                     </v-expansion-panel-content>
@@ -51,7 +52,7 @@
                       Bước 2
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      Để tất cả tập ảnh bạn muốn xử lý vào một thư mục và nén chúng thành định dạng zip 
+                      Để tất cả tập ảnh bạn muốn xử lý vào một thư mục và nén chúng thành định dạng zip
                     </v-expansion-panel-content>
                   </v-expansion-panel>
                   <v-expansion-panel>
@@ -59,7 +60,8 @@
                       Bước 3
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      Bạn có thể sử dụng mặc định của yolov5 để detect hoặc tự chuẩn bị một file custom.pt đã được train đủ để đóng khung được các lớp bạn muốn 
+                      Bạn có thể sử dụng mặc định của yolov5 để detect hoặc tự chuẩn bị một file custom.pt đã được train
+                      đủ để đóng khung được các lớp bạn muốn
                     </v-expansion-panel-content>
                   </v-expansion-panel>
 
@@ -68,7 +70,7 @@
                       Video hướng dẫn
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <iframe width="560" height="315" src="https://www.youtube.com/embed/rU9tFNNRzGg"
+                      <iframe width="560" height="315" src="https://www.youtube.com/embed/9NGTX5pvXvM"
                         title="YouTube video player" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
@@ -168,7 +170,7 @@
         return {
           overlay: false,
           show: false,
-          res: null ,
+          res: null,
           alert: {
             status: '',
             message: ''
@@ -258,12 +260,12 @@
         resetAll() {
           this.e6 = 1
           this.show = false
-        
+
         },
         selectFile1(event) {
           // console.log(event)
           this.file1 = event
-         
+
         },
         selectFile2(event) {
           this.file2 = event
@@ -272,7 +274,7 @@
           this.file3 = event
         },
         completeUpload: async function () {
-          this.res = null 
+          this.res = null
           let data1 = new FormData();
           data1.append('file', this.file1);
           this.overlay = true
@@ -281,20 +283,20 @@
             method: 'POST',
           })
           let status = await resp1.status
-        
+
           if (status != 200) {
             error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
             error.message = 'warning'
           } else {
             let data2 = new FormData()
             data2.append('file', this.file2);
-          
+
             let resp2 = await fetch(`${this.BASE_URL}/api/upload-data-boundingbox`, {
               body: data2,
               method: 'POST',
             })
             status = await resp2.status
-         
+
             if (status != 200) {
               error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
               error.message = 'warning'
@@ -304,13 +306,13 @@
           if (this.show == true) {
             let data3 = new FormData();
             data3.append('file', this.file3);
-          
+
             let resp3 = await fetch(`${this.BASE_URL}/api/upload-data-classifier`, {
               body: data3,
               method: 'POST',
             })
             status = await resp3.status
-         
+
             if (status != 200) {
               error.message = 'Hiện tại quá trình xử lý đang được diễn ra, vui lòng quay lại vào lần khác'
               error.message = 'warning'
@@ -318,13 +320,13 @@
           }
 
           // get result
-          let resp = await fetch(`${this.BASE_URL}/api/get-result`,{
-            method:'POST'
+          let resp = await fetch(`${this.BASE_URL}/api/get-result`, {
+            method: 'POST'
           })
           let resL = await resp.json()
           this.res = resL.message
-          setTimeout(()=>{
-            this.overlay = false 
+          setTimeout(() => {
+            this.overlay = false
           }, 1000)
         }
       }
