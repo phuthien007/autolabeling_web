@@ -274,7 +274,8 @@
           this.file3 = event
         },
         completeUpload: async function () {
-          this.res = null
+          try {
+            this.res = null
           let data1 = new FormData();
           data1.append('file', this.file1);
           this.overlay = true
@@ -328,6 +329,12 @@
           setTimeout(() => {
             this.overlay = false
           }, 1000)
+          } catch (error) {
+            alert(error)
+            setTimeout(() => {
+            this.overlay = false
+            }, 1000)
+          }
         }
       }
     })

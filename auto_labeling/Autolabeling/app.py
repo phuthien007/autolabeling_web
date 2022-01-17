@@ -85,7 +85,7 @@ def processAndSendFile():
         os.remove('./static/upload_data/images.zip')
         deleteAllFile('./datasets/images')
         deleteAllFile('./training_class/data')
-        return  make_response({'message': request.root_url +  'static/images.zip' }), 200
+        return  make_response({'message': os.path.join(request.root_url,'static/images.zip') }), 200
     else:
         return make_response({'message':'error'}), 400
 
@@ -95,6 +95,7 @@ def processAndSendFile():
 
 if __name__ == '__main__':
     app.run()
+    os.remove('./static/images.zip')
     # deleteAllFile('.\\training_class\\data')
     # deleteAllFile('/datasets/images')
 

@@ -10,21 +10,26 @@ class ImageTransform():
     def __init__(self, resize=resize, mean=mean, std=std):
         self.data_transform = {
             'train': transforms.Compose([
+
                 transforms.RandomResizedCrop(resize, scale=(0.5, 1.5)),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomGrayscale(),
                 transforms.ToTensor(),
+                transforms.Normalize((0.5), (0.5)),
                 transforms.Normalize(mean, std),
+
             ]),
             'val': transforms.Compose([
                 transforms.Resize(resize),
                 transforms.CenterCrop(resize),
                 transforms.ToTensor(),
+                transforms.Normalize((0.5), (0.5)),
                 transforms.Normalize(mean, std),
             ]),
             'test': transforms.Compose([
                 transforms.Resize(resize),
                 transforms.ToTensor(),
+                transforms.Normalize((0.5), (0.5)),
                 transforms.Normalize(mean, std),
             ])
         }
